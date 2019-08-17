@@ -227,27 +227,27 @@ def process_entrace(key_list, yuanshi_name_id):
     global property_node
     global relation
     global yuanshi_node
-    property_node.to_csv('/neo4j_csv/property_label.csv',index=False) #将df输出到csv文件，输出顺序为dataframe默认的列名顺序
-    relation.to_csv('/neo4j_csv/relation_label.csv',index=False)
-    yuanshi_node.to_csv('/neo4j_csv/yuanshi_label.csv',index=False)
+    property_node.to_csv('static/neo4j_csv/property_label.csv',index=False) #将df输出到csv文件，输出顺序为dataframe默认的列名顺序
+    relation.to_csv('static/neo4j_csv/relation_label.csv',index=False)
+    yuanshi_node.to_csv('static/neo4j_csv/yuanshi_label.csv',index=False)
     # 表示先删除当前已有的节点和关系
     cypher_delete = '''MATCH(b) detach delete b
                   '''
     test_graph.run(cypher_delete)
     # 表示加载属性到neo4j
-    cypher_node = '''LOAD CSV WITH HEADERS FROM "file:///property_label.csv" AS line
+    cypher_node = '''LOAD CSV WITH HEADERS FROM "http://localhost:5000/static/neo4j_csv/property_label.csv" AS line
                      MERGE (p:attribute{id:line.property_id,name:line.name})
                   '''
     test_graph.run(cypher_node)
     
     # 表示加载实体到neo4j
-    cypher_node = '''LOAD CSV WITH HEADERS FROM "file:///yuanshi_label.csv" AS line
+    cypher_node = '''LOAD CSV WITH HEADERS FROM "http://localhost:5000/static/neo4j_csv/yuanshi_label.csv" AS line
                      MERGE (p:yuanshi{id:line.yuanshi_id,name:line.name})
                   '''
     test_graph.run(cypher_node)
     
     # 表示加载关系到neo4j
-    cypher_relation = '''LOAD CSV WITH HEADERS FROM "file:///relation_label.csv" AS line  
+    cypher_relation = '''LOAD CSV WITH HEADERS FROM "http://localhost:5000/static/neo4j_csv/relation_label.csv" AS line  
                          match (from:yuanshi{id:line.from_id}),(to:attribute{id:line.to_id})  
                          merge (from)-[r:rel{pro1:line.pro1}]->(to)
                       '''
@@ -300,8 +300,10 @@ def main(wait_deal_json):
     global property_node
     global relation
     global json_file #全局列表变量，用于存放不同百科json文件的内容
-    yuanshi_node = pd.read_csv("/neo4j_csv/yuanshi_label.csv")
-    property_node = pd.read_csv("/neo4j_csv/property_label.csv")
-    relation = pd.read_csv("/neo4j_csv/relation_label.csv")
+    yuanshi_node = pd.read_csv("static/neo4j_csv/yuanshi_label.csv")
+    property_node = pd.read_csv("static/neo4j_csv/property_label.csv")
+    relation = pd.read_csv("static/neo4j_csv/relation_label.csv")
+    wait_deal_json = json.loads(wait_deal_json)
     json_file = wait_deal_json
+    print("存入数据库前接收的参数:",json_file,type(json_file))
     deal_yuanshinameid_and_in_process_entrnce(wait_deal_json, json_file)

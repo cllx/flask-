@@ -15,7 +15,7 @@ import json
 import os
 import sys
 import jieba
-import xiaoqi
+import xiaoqi2
 sys.setrecursionlimit(999)  # set the maximum depth as 5000
 
 cs = CilinSimilarity()
@@ -909,8 +909,9 @@ def process_entrace(key_list, baike_name, yuanshi_name):
     res = other_align(st, lq, baike_name) #调用对齐的控制函数
     align_json['院士名'] = yuanshi_name
     path = 'static/align_json/'+yuanshi_name+'.json'
+    align_json = json.dumps(align_json,ensure_ascii=False,indent=4)
     with open(path, 'w') as f:
-        f.write(json.dumps(align_json,ensure_ascii=False,indent=4)) #设置不转换成ascii  json字符串首缩进
+        f.write(align_json) #设置不转换成ascii  json字符串首缩进
     return align_json
 
 def main(yuanshi_name):
@@ -927,5 +928,5 @@ def main(yuanshi_name):
     key_list = list(json_file[0].keys())[2:] #局部变量，用于存放百科json文件的最外层父属性(院士名和百科名不计算)
     yuanshi_name = every_baike_json['院士名']
     align_res = process_entrace(key_list, baike_name, yuanshi_name)
-    xiaoqi_res = xiaoqi.main(yuanshi_name, align_res)
+    xiaoqi_res = xiaoqi2.xiaoqi(yuanshi_name, align_res)
     return xiaoqi_res

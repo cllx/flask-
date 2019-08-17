@@ -45,7 +45,7 @@ class TransE:
     def transE(self, cI = 20, filename = '方滨兴'):
         print("训练开始")
         for cycleIndex in range(cI):
-            Sbatch = self.getSample(27)
+            Sbatch = self.getSample(25)
             Tbatch = []#元组对（原三元组，打碎的三元组）的列表 ：{((h,r,t),(h',r,t'))}
             for sbatch in Sbatch:
                 tripletWithCorruptedTriplet = (sbatch, self.getCorruptedTriplet(sbatch))
@@ -227,7 +227,7 @@ def main(filename):
     transE = TransE(entityList,relationList,tripleList, margin=1, dim = 100)
     print("TranE初始化")
     transE.initialize()
-    transE.transE(10000, filename)
+    transE.transE(5000, filename)
     path1 = "static/TransE_shuju/"+filename+"_relationVector.txt"
     transE.writeRelationVector(path1)
     path2 = "static/TransE_shuju/"+filename+"_entityVector.txt"

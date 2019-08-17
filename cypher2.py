@@ -205,8 +205,20 @@ def generate_resume():
     if request.method == 'POST':
         filename = request.form['filename']
         xiaoqi_res = alignment_boshihou_pre_deal.main(filename)
-        print("***********",xiaoqi_res)
-        #xiaoqi_res = xiaoqi.main(filename, align_res)
+        print("***********消歧处理结果：",xiaoqi_res)
+        global node
+        global link
+        global node_link
+        node = []
+        link = []
+        node_link = {}
+        test_graph = Graph('http://localhost:7474',username='neo4j',password='8611662')
+        query = "MATCH (Person {name:'"+filename+"'})-[r]-(tail) with Person,r,tail return Person,r,tail"
+        res = test_graph.run(query).data()
+        res = DataFrame(res)
+        get_node_link(res)
+        node_link = json.dumps(node_link,ensure_ascii=False,indent=4)
+        return render_template('index.html', yuanshi_info=node_link, filename=filename, generate_resume="success")
  
 if __name__ == '__main__':
     app.config['JSON_AS_ASCII'] = False
